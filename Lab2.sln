@@ -10,9 +10,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainUsefInterface", "MainUs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SplinesCalculator", "SplinesCalculator\SplinesCalculator.vcxproj", "{D476A789-9519-4A42-9B3A-FAB0E8108C86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplinesDataStructures", "SplinesDataStructures\SplinesDataStructures.csproj", "{DFF5418B-0CB2-4DA9-9BB4-C5654DEA1885}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SplinesDataStructures", "SplinesDataStructures\SplinesDataStructures.csproj", "{DFF5418B-0CB2-4DA9-9BB4-C5654DEA1885}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D476A789-9519-4A42-9B3A-FAB0E8108C86} = {D476A789-9519-4A42-9B3A-FAB0E8108C86}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{AF383532-1DC5-4258-9FDB-B8AC33DA455E}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
