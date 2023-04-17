@@ -1,0 +1,350 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:zz="clr-namespace:MainUserInterface"
+        xmlns:oxy="http://oxyplot.org/wpf" x:Class="MainUserInterface.MainWindow"
+        mc:Ignorable="d"
+        Title="Lab 2. Mozgovykh VV" Height="600" Width="800" MinHeight="450" MinWidth="900" Background="#FFF9FFFF" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+
+        <DataTemplate x:Key="key_spline_data_item">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="x = "/>
+                    <TextBlock Text="{Binding X, StringFormat=0.000}"/>
+                    <TextBlock Text="    "/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="S(x) = "/>
+                    <TextBlock Text="{Binding Value, StringFormat=0.000}"/>
+                    <TextBlock Text="    "/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="S'(x) = "/>
+                    <TextBlock Text="{Binding FirstDerivative, StringFormat=0.000}"/>
+                    <TextBlock Text="    "/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <zz:LimitsConverter x:Key="key_limits_converter"/>
+    </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static zz:CustomCommands.CalculateFromControlsCommand}"
+                        CanExecute="CanCalculateFromControlsCommandHandler"
+                        Executed="CalculateFromControlsCommandHandler"/>
+        <CommandBinding Command="{x:Static zz:CustomCommands.CalculateFromFileCommand}"
+                        CanExecute="CanCalculateFromFileCommandHandler"
+                        Executed="CalculateFromFileCommandHandler"/>
+        <CommandBinding Command="ApplicationCommands.Save"
+                        CanExecute="CanSaveCommandHandler"
+                        Executed="SaveCommandHandler"/>
+    </Window.CommandBindings>
+
+    <Grid x:Name="gridMain">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="195*"/>
+            <RowDefinition Height="389*"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="nodesCountTextBox"
+                 HorizontalAlignment="Left"
+                 Height="20" Margin="147,73,0,0"
+                 TextWrapping="Wrap"
+                 Text="{Binding NodesCount, ValidatesOnDataErrors=True}"
+                 VerticalAlignment="Top"
+                 Width="93" Grid.Column="1"/>
+        <Button Grid.Row="0"
+                x:Name="saveRawDataButton"
+                Content="Save RawData"
+                Margin="10,113,10,0"
+                VerticalAlignment="Top"
+                Height="20"
+                Command="ApplicationCommands.Save"
+                CommandParameter="From Button"/>
+        <ComboBox Grid.Column="1" Grid.Row="0"
+                  x:Name="functionSelectorComboBox" 
+                  HorizontalAlignment="Left" 
+                  Height="24"
+                  Margin="105,159,0,0" 
+                  VerticalAlignment="Top"
+                  Width="135"
+                  SelectedItem="{Binding FunctionName, Mode=TwoWay}"/>
+        <TextBox x:Name="splineNodesCountTextBox" 
+                 HorizontalAlignment="Left" 
+                 Height="20" 
+                 Margin="170,48,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding SplineNodesCount, ValidatesOnDataErrors=True}" 
+                 VerticalAlignment="Top"
+                 Width="120" Grid.Column="2"/>
+        <TextBox x:Name="leftFirstDerivativeTextBox" 
+                 HorizontalAlignment="Left" 
+                 Height="20                  "
+                 Margin="170,73,0,0" 
+                 TextWrapping="Wrap" 
+                 Text="{Binding LeftFirstDerivative}"
+                 VerticalAlignment="Top" 
+                 Width="120" Grid.Column="2"/>
+        <TextBox x:Name="rightFirstDerivativeTextBox"
+                 HorizontalAlignment="Left"
+                 Height="20                  "
+                 Margin="170,98,0,0"
+                 TextWrapping="Wrap"
+                 Text="{Binding RightFirstDerivative}"
+                 VerticalAlignment="Top"
+                 Width="120" Grid.Column="2"/>
+        <Button Grid.Row="0"
+                x:Name="loadFromFileButton"
+                Content="RawData from File" 
+                Height="20" 
+                Margin="10,138,10,0" 
+                VerticalAlignment="Top"
+                Click="LoadRawDataFromFile"/>
+        <Button Grid.Row="0"
+                x:Name="loadFromControlsButton" 
+                Content="RawData from Controls" 
+                Height="20" 
+                Margin="10,163,10,0" 
+                VerticalAlignment="Top"
+                Command="{x:Static zz:CustomCommands.CalculateFromControlsCommand}"
+                CommandParameter="From Button"/>
+        <Menu Grid.Row="0"
+              x:Name="optionSelectorMenu" 
+              Height="68" 
+              Margin="10,40,10,0" 
+              VerticalAlignment="Top">
+            <MenuItem Header="File" Width="87" Height="68">
+                <MenuItem Header="Save"
+                          HorizontalAlignment="Left"
+                          Command="ApplicationCommands.Save"
+                          CommandParameter="From MenuItem"/>
+            </MenuItem>
+            <MenuItem Header="Execute" Width="87" Height="68" HorizontalAlignment="Right">
+                <MenuItem Header="RawData from File"
+                          Click="LoadRawDataFromFile"/>
+                <MenuItem Header="RawData from Controls"
+                          Command="{x:Static zz:CustomCommands.CalculateFromControlsCommand}"
+                          CommandParameter="From MenuItem"/>
+            </MenuItem>
+        </Menu>
+        <RadioButton Grid.Column="1" Grid.Row="0"
+                     x:Name="uniformRadioButton"
+                     GroupName="IsUniformButtons"
+                     IsChecked="{Binding IsUniform, UpdateSourceTrigger=PropertyChanged}"
+                     Content="Uniform" 
+                     HorizontalAlignment="Left"
+                     Margin="147,111,0,0"
+                     VerticalAlignment="Top"
+                     Height="21" Width="120" Grid.ColumnSpan="2"/>
+        <RadioButton Grid.Column="1" Grid.Row="0"
+                     x:Name="nonUniformRadioButton"
+                     GroupName="IsUniformButtons"
+                     IsChecked="{Binding IsNonUniform, UpdateSourceTrigger=PropertyChanged}"
+                     Content="Non-uniform" 
+                     HorizontalAlignment="Left" 
+                     Margin="147,126,0,0" 
+                     VerticalAlignment="Top" Height="21" Width="120" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="limitsTextBox"
+                 HorizontalAlignment="Left" 
+                 Height="20" 
+                 Margin="147,48,0,0" 
+                 TextWrapping="Wrap"
+                 Text="{Binding Limits, Converter={StaticResource key_limits_converter}, ValidatesOnDataErrors=True}" 
+                 VerticalAlignment="Top" 
+                 Width="93" Grid.Column="1" Grid.Row="0"/>
+        <ListBox x:Name="rawDataNodesListBox" 
+                 Margin="10,40,10,269" Grid.Row="1"
+                 HorizontalContentAlignment="Center"/>
+        <ListBox x:Name="splineDataItemsListBox"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 ItemsSource="{Binding Items}"
+                 ItemTemplate="{StaticResource key_spline_data_item}"
+                 IsSynchronizedWithCurrentItem="False" Grid.Row="1" Margin="10,184,10,0" Height="80" VerticalAlignment="Top"/>
+        <TextBlock x:Name="integralTextBlock"
+                   TextAlignment="Left"
+                   Margin="0,346,0,10"
+                   Padding="0, 0, 0, 0"
+                   TextWrapping="Wrap"
+                   Background="#FFD3E4DF" 
+                   Grid.Row="1"
+                   HorizontalAlignment="Center"
+                   Width="160"/>
+        <TextBlock x:Name="splineNodeInfoTextBlock"
+                   TextAlignment="Center"
+                   Text="{Binding SelectedItem, ElementName=splineDataItemsListBox, StringFormat=0.000}"
+                   HorizontalAlignment="Center" 
+                   Margin="0,294,0,0" 
+                   TextWrapping="WrapWithOverflow" 
+                   Width="321"
+                   Background="#FFFFEED6"
+                   Grid.Row="1" Height="20" VerticalAlignment="Top"/>
+        <Label Grid.Column="0" Grid.Row="0"
+               TextElement.FontWeight="SemiBold"
+               Background="#FFE6E6FF"
+               Content="Control panel"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center"
+               Height="25" 
+               Margin="0,10,0,0" 
+               VerticalAlignment="Top"/>
+        <Label Grid.Column="1" Grid.Row="0"
+               TextElement.FontWeight="SemiBold"
+               Background="#FFE6FFE6"
+               Content="RawData info"
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center" 
+               Height="25" 
+               Margin="0,10,0,0" 
+               VerticalAlignment="Top"/>
+        <Label Grid.Column="1" Grid.Row="0"
+               Content="Formatted bounds (a; b):"
+               HorizontalContentAlignment="Right"
+               VerticalContentAlignment="Center" 
+               Height="20" 
+               Margin="10,48,0,0" 
+               VerticalAlignment="Top" Padding="0,0,0,0" HorizontalAlignment="Left" Width="132"/>
+        <Label Grid.Column="1" Grid.Row="0"
+            Content="Nodes count:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,73,0,0" 
+            VerticalAlignment="Top" 
+            Width="132" Padding="0,0,0,0"/>
+        <Label Grid.Column="1" Grid.Row="0"
+            Content="Initial grid type:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="50" 
+            Margin="10,98,0,0" 
+            VerticalAlignment="Top" 
+            Width="132" Padding="0,0,0,0"/>
+        <Label Grid.Column="1" Grid.Row="0"
+            Content="Initial function:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,161,0,0" 
+            VerticalAlignment="Top" 
+            Width="90" Padding="0,0,0,0"/>
+        <Label Grid.Column="2" Grid.Row="0"
+            TextElement.FontWeight="SemiBold"
+            Background="#FFFFE6E6"
+            Content="SplineData info"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center" 
+            Height="25" 
+            Margin="0,10,0,0" 
+            VerticalAlignment="Top"/>
+        <Label Grid.Column="2" Grid.Row="0"
+            Content="Spline nodes count:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,48,0,0" 
+            VerticalAlignment="Top" 
+            Width="155" Padding="0,0,0,0"/>
+        <Label Grid.Column="2" Grid.Row="0"
+            Content="Left bound first derivative:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,73,0,0" 
+            VerticalAlignment="Top" 
+            Width="155" Padding="0,0,0,0"/>
+        <Label Grid.Column="2" Grid.Row="0"
+            Content="Spline nodes count:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,48,0,0" 
+            VerticalAlignment="Top" 
+            Width="155" Padding="0,0,0,0"/>
+        <Label Grid.Column="2" Grid.Row="0"
+            Content="Right bound first derivative:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Left" 
+            Height="20" 
+            Margin="10,98,0,0" 
+            VerticalAlignment="Top" 
+            Width="155" Padding="0,0,0,0"/>
+        <Label Grid.Row="1"
+            TextElement.FontWeight="SemiBold"
+            Background="#FFFFFFE6"
+            Content="Initial function values"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center" 
+            Height="25" 
+            Margin="0,10,0,0" 
+            VerticalAlignment="Top"/>
+        <Label Grid.Row="1"
+            TextElement.FontWeight="SemiBold"
+            Background="#FFE6FFFF"
+            Content="Calculated spline info"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center" 
+            Height="25" 
+            Margin="0,129,0,0" 
+            VerticalAlignment="Top"/>
+        <Label Grid.Row="1"
+            Content="Spline values (select item to see details):"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Center" 
+            Height="20" 
+            Margin="0,159,0,0" 
+            VerticalAlignment="Top" 
+            Width="204" Padding="0,0,0,0"/>
+        <Label Grid.Row="1"
+            Content="Detail information:"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalAlignment="Center" 
+            Margin="0,269,0,0" 
+            Width="224" Padding="0,0,0,0" Height="20" VerticalAlignment="Top"/>
+        <Label Grid.Row="1"
+            Content="Spline integral over [a; b] value:"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center" 
+            Margin="0,314,0,35" Padding="0,0,0,0" HorizontalAlignment="Center" Width="164"/>
+
+        <oxy:PlotView Name="splinePlot"
+                      Grid.Column="1" 
+                      Grid.ColumnSpan="2" 
+                      HorizontalAlignment="Left" 
+                      Height="309" 
+                      Margin="10,0,0,0" 
+                      Grid.Row="1" 
+                      VerticalAlignment="Center" 
+                      Width="559"
+                      BorderThickness="1"
+                      Model="{Binding OxyPlotModel.PlotModel}"/>
+        <Label Grid.Row="1"
+            TextElement.FontWeight="SemiBold"
+            Background="#FFFFDEB6"
+            Content="Original (discrete) and interpolated (spline) function"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center" 
+            Height="25" 
+            Margin="0,10,0,0" 
+            VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Column="1"/>
+
+    </Grid>
+</Window>
