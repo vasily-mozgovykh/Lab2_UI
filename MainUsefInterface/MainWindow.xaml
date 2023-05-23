@@ -161,7 +161,7 @@
                  Text="{Binding Limits, Converter={StaticResource key_limits_converter}, ValidatesOnDataErrors=True}" 
                  VerticalAlignment="Top" 
                  Width="93" Grid.Column="1" Grid.Row="0"/>
-        <ListBox x:Name="rawDataNodesListBox" 
+        <ListBox x:Name="rawDataNodesListBox"
                  Margin="10,40,10,269" Grid.Row="1"
                  HorizontalContentAlignment="Center"/>
         <ListBox x:Name="splineDataItemsListBox"
@@ -183,7 +183,7 @@
                    TextAlignment="Center"
                    Text="{Binding SelectedItem, ElementName=splineDataItemsListBox, StringFormat=0.000}"
                    HorizontalAlignment="Center" 
-                   Margin="0,294,0,0" 
+                   Margin="0,294,0,0"
                    TextWrapping="WrapWithOverflow" 
                    Width="321"
                    Background="#FFFFEED6"

@@ -26,15 +26,12 @@ namespace MainUsefInterface
         public void AddPoints(RawData rawData, List<SplineDataItem> items)
         {
             string functionName = rawData.Function.Method.Name;
-            double step = (rawData.Right - rawData.Left) / items.Count;
-            
             double[] X = new double[rawData.NodesCount];
             double[] Y = new double[rawData.NodesCount];
-            step = (rawData.Right - rawData.Left) / (rawData.NodesCount - 1);
             for (int i = 0; i < rawData.NodesCount; i++)
             {
-                X[i] = rawData.Left + step * i;
-                Y[i] = rawData.Function(X[i]);
+                X[i] = rawData.Nodes[i];
+                Y[i] = rawData.Values[i];
             }
             XL.Add(X);
             YL.Add(Y);

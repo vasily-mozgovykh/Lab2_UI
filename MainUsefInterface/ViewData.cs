@@ -119,8 +119,8 @@ namespace MainUserInterface
         #region INPUT/OUTPUT
         public void Save(string filename)
         {
-            RawDataFromControls();
             rawData.Save(filename);
+            //RawDataFromControls();
         }
 
         public void Load(string filename)
@@ -133,12 +133,17 @@ namespace MainUserInterface
                 NodesCount = rawData.NodesCount;
                 IsUniform = rawData.IsUniform;
                 IsNonUniform = !(rawData.IsUniform);
-                if (rawData.Function.Method.Name == "Linear")
-                    FunctionName = FRawEnum.Linear;
-                else if (rawData.Function.Method.Name == "Cubic")
-                    FunctionName = FRawEnum.Cubic;
-                else
-                    FunctionName = FRawEnum.PseudoRandom;
+                switch (rawData.Function.Method.Name)
+                {
+                    case "Linear":
+                        FunctionName = FRawEnum.Linear; break;
+                    case "Cubic":
+                        FunctionName = FRawEnum.Cubic; break;
+                    case "Cosine":
+                        FunctionName = FRawEnum.Cosine; break;
+                    default:
+                        FunctionName = FRawEnum.PseudoRandom; break;
+                }
             }
             catch (Exception e)
             {
@@ -161,6 +166,8 @@ namespace MainUserInterface
                     function = RawData.Linear; break;
                 case FRawEnum.Cubic:
                     function = RawData.Cubic; break;
+                case FRawEnum.Cosine:
+                    function = RawData.Cosine; break;
                 case FRawEnum.PseudoRandom:
                     function = RawData.PseudoRandom; break;
             }

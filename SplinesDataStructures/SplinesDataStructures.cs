@@ -9,6 +9,7 @@ namespace SplinesDataStructures
     {
         Linear,
         Cubic,
+        Cosine,
         PseudoRandom
     }
 
@@ -34,10 +35,15 @@ namespace SplinesDataStructures
 
             Nodes = new double[NodesCount];
             Values = new double[NodesCount];
+            Random rand = new Random();
             double step = (right - left) / (NodesCount - 1);
             for (int i = 0; i < NodesCount; i++)
             {
                 Nodes[i] = Left + step * i;
+                if (i != 0 && i !=  NodesCount - 1 && !IsUniform)
+                {
+                    Nodes[i] += step * (-0.49d + 0.99d * rand.NextDouble());
+                } 
                 Values[i] = function(Nodes[i]);
             }
         }
@@ -50,7 +56,7 @@ namespace SplinesDataStructures
             Right = rawData.Right;
             NodesCount = rawData.NodesCount;
             Values = rawData.Values;
-            Function = PseudoRandom;
+            Function = Cosine;
 
             Nodes = new double[NodesCount];
             Values = new double[NodesCount];
@@ -69,10 +75,15 @@ namespace SplinesDataStructures
             return Math.Pow(x, 3);
         }
 
+        public static double Cosine(double x)
+        {
+            return Math.Cos(x);
+        }
+
         public static double PseudoRandom(double x)
         {
-            Random random = new Random();
-            return random.NextDouble();
+            Random rand = new Random();
+            return rand.NextDouble();
         }
         #endregion
 
@@ -94,11 +105,19 @@ namespace SplinesDataStructures
                 string jsonNodesCount = JsonSerializer.Serialize(NodesCount, options);
                 string jsonIsUniform = JsonSerializer.Serialize(IsUniform, options);
                 string jsonFunctionName = Function.Method.Name;
+                double[] values = new double[2 * NodesCount];
+                for (int i = 0; i < NodesCount; i++)
+                {
+                    values[2 * i] = Nodes[i];
+                    values[2 * i + 1] = Values[i];
+                }
+                string jsonValues = JsonSerializer.Serialize(values, options);
                 writer.WriteLine(jsonLeft);
                 writer.WriteLine(jsonRight);
                 writer.WriteLine(jsonNodesCount);
                 writer.WriteLine(jsonIsUniform);
                 writer.WriteLine(jsonFunctionName);
+                writer.WriteLine(jsonValues);
             }
             catch (Exception e)
             {
@@ -123,6 +142,8 @@ namespace SplinesDataStructures
             int nodesCount;
             bool isUniform;
             FRaw? function = null;
+            double[]? values = Array.Empty<double>();
+
             try
             {
                 reader = new StreamReader(filename);
@@ -131,6 +152,7 @@ namespace SplinesDataStructures
                 string? jsonNodesCount = reader.ReadLine();
                 string? jsonIsUniform = reader.ReadLine();
                 string? jsonFunctionName = reader.ReadLine();
+                string? jsonValues = reader.ReadToEnd();
 
                 if (jsonLeft == null || jsonRight == null || jsonNodesCount == null || jsonIsUniform == null || jsonFunctionName == null)
                 {
@@ -142,18 +164,21 @@ namespace SplinesDataStructures
                 isUniform = JsonSerializer.Deserialize<bool>(jsonIsUniform, options);
 
                 FRaw func = Linear;
-                if (jsonFunctionName == func.Method.Name)
+                switch (jsonFunctionName)
                 {
-                    function = Linear;
+                    case "Linear":
+                        function = Linear; break;
+                    case "Cubic":
+                        function = Cubic; break;
+                    case "Cosine":
+                        function = Cosine; break;
+                    default:
+                        function = PseudoRandom; break;
                 }
-                else if (jsonFunctionName == (func = Cubic).Method.Name)
-                {
-                    function = Cubic;
-                }
-                else
-                {
-                    function = PseudoRandom;
-                }
+
+                values = JsonSerializer.Deserialize<double[]>(jsonValues, options);
+                if (values == null || values.Length != 2 * nodesCount)
+                    throw new Exception("Can't load RawData values");
             }
             catch (Exception e)
             {
@@ -163,8 +188,13 @@ namespace SplinesDataStructures
             {
                 reader?.Close();
             }
-
-            return new RawData(left, right, nodesCount, isUniform, function);
+            RawData newData = new RawData(left, right, nodesCount, isUniform, function);
+            for (int i = 0; i < nodesCount; i++)
+            {
+                newData.Nodes[i] = values[2 * i];
+                newData.Values[i] = values[2 * i + 1];
+            }
+            return newData;
         }
         #endregion
     }
